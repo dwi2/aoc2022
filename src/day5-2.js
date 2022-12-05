@@ -44,11 +44,19 @@ module.exports = {
     });
 
     let result = '';
-    stacks.forEach(stack => {
+    stacks.forEach((stack, index) => {
+      let prettyOutput = `${index + 1}: `;
+      stack.forEach(cargo => {
+        prettyOutput += `[${cargo}] `
+      });
+      console.log(prettyOutput);
+
       if (stack.length > 0) {
         result += stack[stack.length - 1];
       }
     });
+
+    console.log('----------');
     console.log(result);
   },
 };
