@@ -23,20 +23,13 @@ module.exports = {
         }
       }
     } else if (line.includes('move')) {
-      const result = [];
-      const tokens = line.split(" ");
-      tokens.forEach(token => {
-        const num = Number.parseInt(token);
-        if (!Number.isNaN(num)) {
-          result.push(num);
-        }
-      });
-      // console.log(result);
+      const pattern = /move (\d+) from (\d+) to (\d+)/;
+      const result = line.match(pattern);
       instructions.push({
-        move: result[0],
-        from: result[1],
-        to: result[2]
-      })
+        move: Number.parseInt(result[1]),
+        from: Number.parseInt(result[2]),
+        to: Number.parseInt(result[3])
+      });
     }
 
   },
@@ -51,10 +44,12 @@ module.exports = {
       }
     });
 
+    let result = '';
     stacks.forEach(stack => {
       if (stack.length > 0) {
-        console.log(stack[stack.length - 1]);
+        result += stack[stack.length - 1];
       }
     });
+    console.log(result);
   },
 };
