@@ -6,7 +6,7 @@ module.exports = {
     if (line.length === 0) {
       return;
     }
-    trees.push(line);
+    trees.push(line.split("").map(t => Number.parseInt(t)));
   },
   solving: () => {
     const highestFromTop = [];
@@ -15,15 +15,16 @@ module.exports = {
       highestFromTop[i] = 0;
       highestFromBottom[i] = 0;
     }
-    // go right and down
+    // go down
     trees.forEach((row, rowIndex) => {
       const isEdgeRow = rowIndex === 0 || rowIndex === trees.length - 1;
       visibleTrees[rowIndex] = Array(row.length);
       visibleTrees[rowIndex].fill( isEdgeRow ? 1 : 0);
 
       let highestFromLeft = 0;
+      // go right
       for (let c = 0; c < row.length; c += 1) {
-        const tree = Number.parseInt(row[c]);
+        const tree = row[c];
         const ht = highestFromTop[c];
         if (tree > ht) {
           highestFromTop[c] = tree;
@@ -38,9 +39,10 @@ module.exports = {
         }
       }
 
+      // go left
       let highestFromRight = 0;
       for (let c = row.length - 1; c >= 0; c -= 1) {
-        const tree = Number.parseInt(row[c]);
+        const tree = row[c];
         if (tree > highestFromRight) {
           highestFromRight = tree;
           visibleTrees[rowIndex][c] = 1;
@@ -48,10 +50,11 @@ module.exports = {
       }
     });
 
+    // go up
     for (let rowIndex = trees.length - 1; rowIndex >= 0; rowIndex -= 1) {
       const row = trees[rowIndex];
       for (let c = 0; c < row.length; c += 1) {
-        const tree = Number.parseInt(row[c]);
+        const tree = row[c];
         const hb = highestFromBottom[c];
         if (tree > hb) {
           highestFromBottom[c] = tree;
