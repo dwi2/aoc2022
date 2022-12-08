@@ -1,7 +1,21 @@
+
 const commands = [];
 const output = [];
 let buffer = [];
 let dirStack = [];
+
+const getPathFrom = (dirStack) => {
+  if (!Array.isArray(dirStack)) {
+    return "";
+  }
+
+  if (dirStack.length <= 1) {
+    return dirStack.join("");
+  }
+
+  const result = dirStack[0] + dirStack.slice(1).join("/");
+  return result;
+};
 
 module.exports = {
   reading: (line) => {
@@ -14,12 +28,12 @@ module.exports = {
         commands.push(line.substring(2));
       } else {
         buffer.push(line);
-      }  
+      }
     }
   },
   solving: () => {
     output.push(buffer);
-    buffer = [];    
+    buffer = [];
 
     const dirMap = new Map();
     let size = 0;
@@ -29,7 +43,7 @@ module.exports = {
         const dirName = command.substring(3);
         if (dirName === '..') {
           dirStack.pop();
-          const cwd = dirStack.join("/");
+          const cwd = getPathFrom(dirStack);
           if (dirMap.has(cwd)) {
             const oldSize = dirMap.get(cwd);
             size = oldSize + size;
@@ -40,7 +54,7 @@ module.exports = {
           size = 0;
         }
       } else if (command.startsWith('ls')) {
-        const contents = output.shift();    
+        const contents = output.shift();
         contents.forEach(content => {
           if (!content.startsWith('dir')) {
             const fileSize = Number.parseInt(content.split(" ")[0]);
@@ -48,7 +62,7 @@ module.exports = {
             totalUsed += fileSize;
           }
         });
-        const cwd = dirStack.join("/");
+        const cwd = getPathFrom(dirStack);
         dirMap.set(cwd, size);
       }
     });
