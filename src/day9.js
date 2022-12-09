@@ -58,39 +58,12 @@ module.exports = {
           //   "skip"
           // );
           continue;
-        } else if (!isNotSameLane && distance > 1) {
-          switch (direction) {
-            case "U":
-              tail[1] += 1;
-              break;
-            case "D":
-              tail[1] -= 1;
-              break;
-            case "L":
-              tail[0] -= 1;
-              break;
-            case "R":
-              tail[0] += 1;
-              break;
-          }
         } else {
-          switch (direction) {
-            case "U":
-              tail[0] = head[0] > tail[0] ? tail[0] + 1 : tail[0] - 1;
-              tail[1] += 1;
-              break;
-            case "D":
-              tail[0] = head[0] > tail[0] ? tail[0] + 1 : tail[0] - 1;
-              tail[1] -= 1;
-              break;
-            case "L":
-              tail[0] -= 1;
-              tail[1] = head[1] > tail[1] ? tail[1] + 1 : tail[1] - 1;
-              break;
-            case "R":
-              tail[0] += 1;
-              tail[1] = head[1] > tail[1] ? tail[1] + 1 : tail[1] - 1;
-              break;
+          if (tail[0] !== head[0]) {
+            tail[0] = head[0] > tail[0] ? tail[0] + 1 : tail[0] - 1;
+          }
+          if (tail[1] !== head[1]) {
+            tail[1] = head[1] > tail[1] ? tail[1] + 1 : tail[1] - 1;
           }
         }
         // console.log(direction, i, head, tail, !isNotSameLane, distance);
