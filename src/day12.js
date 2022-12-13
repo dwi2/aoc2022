@@ -46,7 +46,7 @@ const selectCandidates = (now, visited) => {
       return;
     }
     const diff = getDiff(point.h, now.h);
-    if (diff <= 1 && diff >= -4 && !visited.has(toCoord(point))) {
+    if (diff <= 1 && diff >= -2 && !visited.has(toCoord(point))) {
       candidates.push(point);
     } else if (point.h === 'E' && (now.h === 'z' || now.h === 'y')) {
       candidates.unshift(point);
@@ -108,44 +108,42 @@ module.exports = {
     let now = JSON.parse(JSON.stringify(start));
     let loop = 0;
 
-    while (!(now.c === end.c && now.r === end.r) && loop < maxRow * maxColumn * 2) {
+    while (!(now.c === end.c && now.r === end.r) && loop < maxRow * maxColumn * 20) {
       let coord = toCoord(now);
       visited.add(coord);
       path.push(now);
       records.push(`(${now.c + 1}, ${now.r + 1}) ${now.h}`);
-      console.log(`Reached (${now.c + 1}, ${now.r + 1}) ${now.h} ${now.direction}`);
+      console.log(`REACHED (${now.c + 1}, ${now.r + 1}) ${now.h} ${now.direction}`);
 
       let candidates = selectCandidates(now, visited);
-      // console.log(candidates);
 
       while (!candidates || candidates.length === 0) {
         // Backtrack
         console.log(`BACKTRACK from (${now.c + 1}, ${now.r + 1}) candidateMap(${candidateMap.size})`);
-        path.pop();
+        const prev = path.pop();
+        coord = toCoord(prev);
         visited.delete(coord);
-        // candidateMap.delete(coord)
 
         now = path[path.length - 1];
-        // candidates = selectCandidates(now, visited);
         candidates = candidateMap.get(toCoord(now));
-        console.log(`get candidateMap of (${now.c + 1}, ${now.r + 1}), ${candidates && candidates.length}`);
-        // console.log(candidates, candidateMap);
+        // console.log(`get candidateMap of (${now.c + 1}, ${now.r + 1}), ${candidates && candidates.length}`);
       }
 
       now = candidates.shift();
       if (candidates.length > 0) {
         candidateMap.set(toCoord(now), candidates);
-        console.log(`Added ${candidates.length} candidates of (${now.c + 1}, ${now.r + 1}) in candidateMap(${candidateMap.size})`);
+        // console.log(`Added ${candidates.length} candidates of (${now.c + 1}, ${now.r + 1}) in candidateMap(${candidateMap.size})`);
       }
       loop += 1;
     }
 
+    // console.log(visited);
     console.log(visited.size);
 
     const fullPath = path.reduce((acc, point) => {
       return point.direction ? acc + point.direction : '';
     }, '');
     console.log(fullPath, fullPath.length);
-    // console.log(path, loop);
+    console.log(loop);
   },
 };
