@@ -46,7 +46,7 @@ const selectCandidates = (now, visited) => {
       return;
     }
     const diff = getDiff(point.h, now.h);
-    if (diff <= 1 && diff >= -2 && !visited.has(toCoord(point))) {
+    if (diff <= 1 && !visited.has(toCoord(point))) {
       candidates.push(point);
     } else if (point.h === 'E' && (now.h === 'z' || now.h === 'y')) {
       candidates.unshift(point);
@@ -64,13 +64,6 @@ const selectCandidates = (now, visited) => {
 
   return candidates;
 };
-
-const records = [];
-// process.on('uncaughtException', () => {
-//   records.forEach(rec => {
-//     console.log(rec);
-//   })
-// });
 
 module.exports = {
   reading: (line) => {
@@ -103,47 +96,33 @@ module.exports = {
     // console.log(hmap);
 
     const visited = new Set();
-    const path = [];
-    const candidateMap = new Map();
     let now = JSON.parse(JSON.stringify(start));
-    let loop = 0;
+    let candidates = [now];
 
-    while (!(now.c === end.c && now.r === end.r) && loop < maxRow * maxColumn * 20) {
-      let coord = toCoord(now);
-      visited.add(coord);
-      path.push(now);
-      records.push(`(${now.c + 1}, ${now.r + 1}) ${now.h}`);
-      console.log(`REACHED (${now.c + 1}, ${now.r + 1}) ${now.h} ${now.direction}`);
+    let coord = toCoord(now);
+    visited.add(coord);
 
-      let candidates = selectCandidates(now, visited);
-
-      while (!candidates || candidates.length === 0) {
-        // Backtrack
-        console.log(`BACKTRACK from (${now.c + 1}, ${now.r + 1}) candidateMap(${candidateMap.size})`);
-        const prev = path.pop();
-        coord = toCoord(prev);
-        visited.delete(coord);
-
-        now = path[path.length - 1];
-        candidates = candidateMap.get(toCoord(now));
-        // console.log(`get candidateMap of (${now.c + 1}, ${now.r + 1}), ${candidates && candidates.length}`);
-      }
-
+    while (candidates.length > 0) {
       now = candidates.shift();
-      if (candidates.length > 0) {
-        candidateMap.set(toCoord(now), candidates);
-        // console.log(`Added ${candidates.length} candidates of (${now.c + 1}, ${now.r + 1}) in candidateMap(${candidateMap.size})`);
+      console.log(`REACHED (${now.c}, ${now.r}) ${now.h} ${now.direction}`);
+
+      if (now.c === end.c && now.r === end.r) {
+        break;
       }
-      loop += 1;
+
+      let newCandidates = selectCandidates(now, visited);
+      newCandidates.forEach(point => {
+        visited.add(toCoord(point));
+        point.parent = now;
+      });
+      candidates = candidates.concat(newCandidates);
     }
 
-    // console.log(visited);
-    console.log(visited.size);
-
-    const fullPath = path.reduce((acc, point) => {
-      return point.direction ? acc + point.direction : '';
-    }, '');
-    console.log(fullPath, fullPath.length);
-    console.log(loop);
+    let lengthOfPath = 0;
+    while (now.parent) {
+      lengthOfPath += 1;
+      now = now.parent;
+    }
+    console.log(lengthOfPath);
   },
 };
