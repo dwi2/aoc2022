@@ -24,6 +24,7 @@ const print = ({
   lines.forEach((row) => {
     console.log(row);
   });
+  console.log('\n');
 };
 
 module.exports = {
@@ -96,23 +97,22 @@ module.exports = {
     scanMap.set(toKey(500, 0), "o");
 
     while (sandY <= bottommost) {
-      // print({ leftmost, rightmost, topmost, bottommost, scanMap });
-      // console.log('\n');
+      print({ leftmost, rightmost, topmost, bottommost, scanMap });
 
       scanMap.delete(toKey(sandX, sandY));
       if (!scanMap.has(toKey(sandX, sandY + 1))) {
         sandY += 1;
-        scanMap.set(toKey(sandX, sandY));
+        scanMap.set(toKey(sandX, sandY), "o");
         // console.log(`down: ${toKey(sandX, sandY)}`);
       } else if (!scanMap.has(toKey(sandX - 1, sandY + 1))) {
         sandX -= 1;
         sandY += 1;
-        scanMap.set(toKey(sandX, sandY));
+        scanMap.set(toKey(sandX, sandY), "o");
         // console.log(`down + left: ${toKey(sandX, sandY)}`);
       } else if (!scanMap.has(toKey(sandX + 1, sandY + 1))) {
         sandX += 1;
         sandY += 1;
-        scanMap.set(toKey(sandX, sandY));
+        scanMap.set(toKey(sandX, sandY), "o");
         // console.log(`down + right: ${toKey(sandX, sandY)}`);
       } else {
         // rest
