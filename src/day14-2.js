@@ -106,7 +106,7 @@ module.exports = {
 
     while (sandY <= bottommost && !restAtStartingPoint) {
       const temp = scanMap.get(toKey(sandX, sandY));
-      console.log(sandX, sandY, temp, temp === 'o');
+      // console.log(sandX, sandY, temp, temp === 'o');
       // print({ leftmost, rightmost, topmost, bottommost, scanMap });
       if (temp === "o") {
         scanMap.delete(toKey(sandX, sandY));
@@ -118,22 +118,20 @@ module.exports = {
         // console.log(`down: ${toKey(sandX, sandY)}`);
       } else if (!scanMap.has(toKey(sandX - 1, sandY + 1))) {
         sandX -= 1;
-        if (sandX < leftmost) {
-          for (l = 0; l >= -20; l -= 1) {
-            leftmost -= 1;
-            scanMap.set(toKey(leftmost, bottommost), '#');  
-          }
+        if (sandX <= leftmost) {
+          // console.log(`expand leftmost from ${leftmost} to ${leftmost - 1}`);
+          leftmost -= 1;
+          scanMap.set(toKey(leftmost, bottommost), '#');  
         }
         sandY += 1;
         scanMap.set(toKey(sandX, sandY), 'o');
         // console.log(`down + left: ${toKey(sandX, sandY)}`);
       } else if (!scanMap.has(toKey(sandX + 1, sandY + 1))) {
         sandX += 1;
-        if (sandX > rightmost) {
-          for (r = 0; r <= 20; r += 1) {
-            rightmost += 1;
-            scanMap.set(toKey(rightmost, bottommost), '#');  
-          }
+        if (sandX >= rightmost) {
+          // console.log(`expand rightmost from ${rightmost} to ${rightmost + 1}`);
+          rightmost += 1;
+          scanMap.set(toKey(rightmost, bottommost), '#');  
         }
         sandY += 1;
         scanMap.set(toKey(sandX, sandY), 'o');
