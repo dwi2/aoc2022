@@ -97,7 +97,7 @@ module.exports = {
     scanMap.set(toKey(500, 0), "o");
 
     while (sandY <= bottommost) {
-      print({ leftmost, rightmost, topmost, bottommost, scanMap });
+      // print({ leftmost, rightmost, topmost, bottommost, scanMap });
 
       scanMap.delete(toKey(sandX, sandY));
       if (!scanMap.has(toKey(sandX, sandY + 1))) {
