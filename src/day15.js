@@ -2,8 +2,8 @@ const toKey = (x, y) => {
   return `${x},${y}`;
 };
 
-const fromKey = key => {
-  return key.split(",").map(n => Number.parseInt(n));
+const fromKey = (key) => {
+  return key.split(",").map((n) => Number.parseInt(n));
 };
 
 /*
@@ -76,13 +76,17 @@ module.exports = {
     topmost = sensorY < topmost ? sensorY : topmost;
     bottommost = sensorY > bottommost ? sensorY : bottommost;
 
-    const manhattanDistance = Math.abs(sensorX - beaconX) + Math.abs(sensorY - beaconY);
-    if (sensorY + manhattanDistance >= lineNumber || sensorY - manhattanDistance <= lineNumber) {
+    const manhattanDistance =
+      Math.abs(sensorX - beaconX) + Math.abs(sensorY - beaconY);
+    if (
+      sensorY + manhattanDistance >= lineNumber ||
+      sensorY - manhattanDistance <= lineNumber
+    ) {
       cmap.set(toKey(sensorX, sensorY), {
         type: "S",
         closestBeacon: { x: beaconX, y: beaconY },
         manhattanDistance,
-      });  
+      });
     }
     if (!cmap.has(toKey(beaconX, beaconY))) {
       cmap.set(toKey(beaconX, beaconY), {
@@ -91,50 +95,37 @@ module.exports = {
         y: beaconY,
       });
     }
-
   },
   solving: () => {
-    // console.log(cmap);
-    // print();
+    console.log(cmap);
+    console.log('START!');
 
+    let spans = [];
     cmap.forEach((value, key) => {
-      if (value.type === 'S') {
+      if (value.type === "S") {
         const [x, y] = fromKey(key);
-        // console.log(x, y, value);
+        if (lineNumber < y - value.manhattanDistance || lineNumber > y + value.manhattanDistance) {
+          return;
+        }
+
+        let turnEnd = 0;
         for (let turn = 0; turn <= value.manhattanDistance; turn += 1) {
-          for (let i = 0; i <= turn; i += 1) {
-            const right = x + i;
-            const left = x - i;
-            for (let j = 0; j <= (value.manhattanDistance - i); j += 1) {
-              const up = y - j;
-              const down = y + j;
-              if (!cmap.has(toKey(right, up))) {
-                cmap.set(toKey(right, up), {type: '#'});
-              }
-              if (!cmap.has(toKey(right, down))) {
-                cmap.set(toKey(right, down), {type: '#'});
-              }
-              if (!cmap.has(toKey(left, up))) {
-                cmap.set(toKey(left, up), {type: '#'});
-              }
-              if (!cmap.has(toKey(left, down))) {
-                cmap.set(toKey(left, down), {type: '#'});
-              }
+          const remainingDistance = value.manhattanDistance - turn;
+          const topBorder = y - remainingDistance;
+          const bottomBorder = y + remainingDistance;
+          if (lineNumber >= topBorder && lineNumber <= bottomBorder) {
+            if (turn > turnEnd) {
+              turnEnd = turn;
             }
           }
         }
-        // print();
+        console.log(`turnEnd = ${turnEnd}`);
+        console.log(`${x - turnEnd} -> ${x + turnEnd}`);
+        spans.push([x - turnEnd, x + turnEnd]);
       }
     });
 
-    // print();
-    let result = 0;
-    for (let x = leftmost; x <= rightmost; x += 1) {
-      const point = cmap.get(toKey(x, lineNumber));
-      if (point && point.type === '#') {
-        result += 1;
-      }
-    }
-    console.log(result);
+    console.log(spans);
+    // aggregate the spans, and reduce the number of beacon on the linenumber (10/2000000) is the answer
   },
 };
