@@ -2,6 +2,10 @@ const toKey = (x, y) => {
   return `${x},${y}`;
 };
 
+const fromKey = key => {
+  return key.split(",").map(n => Number.parseInt(n));
+};
+
 /*
 Map(20) {
   '2,18' => { type: 'S', closestBeacon: { x: -2, y: 15 }, manhattanDistance: 7 },
@@ -15,6 +19,9 @@ let leftmost = 0;
 let rightmost = 0;
 let topmost = 0;
 let bottommost = 0;
+
+// const lineNumber = 10;
+const lineNumber = 2000000;
 
 const print = () => {
   console.log(leftmost, rightmost, topmost, bottommost);
@@ -59,19 +66,6 @@ module.exports = {
     const beaconY = Number.parseInt(
       beaconText.match(/closest beacon is at x=-?[\d]+, y=(-?[\d]+)/)[1]
     );
-    cmap.set(toKey(sensorX, sensorY), {
-      type: "S",
-      closestBeacon: { x: beaconX, y: beaconY },
-      manhattanDistance:
-        Math.abs(sensorX - beaconX) + Math.abs(sensorY - beaconY),
-    });
-    if (!cmap.has(toKey(beaconX, beaconY))) {
-      cmap.set(toKey(beaconX, beaconY), {
-        type: "B",
-        x: beaconX,
-        y: beaconY,
-      });
-    }
 
     leftmost = beaconX < leftmost ? beaconX : leftmost;
     rightmost = beaconX > rightmost ? beaconX : rightmost;
@@ -81,16 +75,66 @@ module.exports = {
     bottommost = beaconY > bottommost ? beaconY : bottommost;
     topmost = sensorY < topmost ? sensorY : topmost;
     bottommost = sensorY > bottommost ? sensorY : bottommost;
+
+    const manhattanDistance = Math.abs(sensorX - beaconX) + Math.abs(sensorY - beaconY);
+    if (sensorY + manhattanDistance >= lineNumber || sensorY - manhattanDistance <= lineNumber) {
+      cmap.set(toKey(sensorX, sensorY), {
+        type: "S",
+        closestBeacon: { x: beaconX, y: beaconY },
+        manhattanDistance,
+      });  
+    }
+    if (!cmap.has(toKey(beaconX, beaconY))) {
+      cmap.set(toKey(beaconX, beaconY), {
+        type: "B",
+        x: beaconX,
+        y: beaconY,
+      });
+    }
+
   },
   solving: () => {
-    console.log(cmap);
-    print();
+    // console.log(cmap);
+    // print();
+
     cmap.forEach((value, key) => {
       if (value.type === 'S') {
-        const [x, y] = key.split(",");
-        // go
+        const [x, y] = fromKey(key);
+        // console.log(x, y, value);
+        for (let turn = 0; turn <= value.manhattanDistance; turn += 1) {
+          for (let i = 0; i <= turn; i += 1) {
+            const right = x + i;
+            const left = x - i;
+            for (let j = 0; j <= (value.manhattanDistance - i); j += 1) {
+              const up = y - j;
+              const down = y + j;
+              if (!cmap.has(toKey(right, up))) {
+                cmap.set(toKey(right, up), {type: '#'});
+              }
+              if (!cmap.has(toKey(right, down))) {
+                cmap.set(toKey(right, down), {type: '#'});
+              }
+              if (!cmap.has(toKey(left, up))) {
+                cmap.set(toKey(left, up), {type: '#'});
+              }
+              if (!cmap.has(toKey(left, down))) {
+                cmap.set(toKey(left, down), {type: '#'});
+              }
+            }
+          }
+        }
+        // print();
       }
-      
     });
+
+    // print();
+    let result = 0;
+    for (let x = leftmost; x <= rightmost; x += 1) {
+      const point = cmap.get(toKey(x, lineNumber));
+      if (point && point.type === '#') {
+        result += 1;
+      }
+    }
+    console.log(result);
   },
 };
